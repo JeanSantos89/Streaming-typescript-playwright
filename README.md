@@ -43,6 +43,51 @@ Os testes foram organizados por páginas e responsabilidades, seguindo padrão P
 | CT14 | HomePage | MoviesCategoria | Geral | Exibir detalhes de conteúdo. |
 ---
 
+# 3. Importância de cada Caso de Teste
+Por que cada fluxo é importante:
+
+CT01 – Login (Deslogado)
+Valida o fluxo mínimo de autenticação, pré-requisito para recursos personalizados e sincronizados.
+
+CT02 – Login + Logout
+Garante integridade do ciclo de sessão (criação, manutenção e destruição), crítico para segurança.
+
+CT03 – InterestActions (Logado)
+Valida operações CRUD de listas pessoais (ex.: “Minha Lista”), impactando retenção e recomendação.
+
+CT04 – Filtros em Ranking (Logado)
+Testa lógica de filtragem + personalização; essencial para algoritmos de descoberta.
+
+CT05 – Filtros em Ranking (Deslogado)
+Assegura que visitantes naveguem no catálogo sem limitações, aumentando conversão.
+
+CT06 – Paginação (Logado)
+Garante carregamento incremental de conteúdos com dados personalizados.
+
+CT07 – Paginação (Deslogado)
+Verifica escalabilidade do catálogo para usuários novos/visitantes.
+
+CT08 – Ranking (Logado)
+Testa acesso a rankings adaptados ao perfil, garantindo consistência das regras de negócio.
+
+CT09 – Ranking (Deslogado)
+Confirma exibição pública de conteúdos mais populares (vitrine principal).
+
+CT10 – Busca sem resultado
+Valida UX de no-content state e mensagens adequadas de fallback.
+
+CT11 – Busca parcial
+Testa a responsividade da busca com termos incompletos (auto-suggest/contain search).
+
+CT12 – Carregamento da Home
+Verifica renderização inicial dos módulos principais e integridade dos componentes.
+
+CT13 – Busca com resultado
+Garante a integridade do fluxo primário de descoberta.
+
+CT14 – Detalhes do conteúdo
+Valida componentes críticos (sinopse, mídia, metadados) que antecedem o “play”.
+
 # 4. Por que Playwright e TypeScript?
 
 ## 4.1 Por que Playwright?
@@ -69,8 +114,75 @@ TypeScript foi escolhido porque:
 A combinação Playwright + TypeScript garante **confiabilidade, velocidade e qualidade**.
 
 ---
+# 5. Decisões de Escopo
+Priorizei os fluxos mais críticos para a jornada de uso em uma plataforma de streaming, contemplando:
+- Cenários autenticados e não autenticados, para garantir consistência na experiência do usuário.
+- Fluxos negativos essenciais (ex.: buscas sem resultado), que validam resiliência da aplicação.
+- Operações centrais de descoberta e navegação do catálogo (ranking, filtros, cards na home), pilares de engajamento em streaming.
+- Uso de mocks/dados falsos, garantindo reprodutibilidade, isolamento dos testes e ausência de dependência de dados voláteis.
 
-# 5. Como Executar (Reprodutibilidade)
+---
+# 6. Arquitetura e Organização do Código
+A automação foi estruturada com foco em **reutilização**, **clareza** e **baixa manutenção**, adotando uma combinação de Page Objects, comandos reutilizáveis e módulos auxiliares.
+
+## Page Objects / Commands
+
+Foi utilizado o padrão **Page Object Model (POM)** para encapsular seletores, interações e comportamentos de cada página.  
+Cada classe de página contém:
+
+- Seletores centralizados  
+- Métodos de interação (commands)  
+- Navegação específica  
+- Pequenas validações da própria página  
+
+Arquivos presentes no projeto:
+- `MoviesPage.ts`
+- `RankingPage.ts`
+- `InterestElements.ts`
+- `RankingElements.ts`
+
+**Benefícios:**  
+- Reduz duplicação  
+- Facilita manutenção  
+- Torna os testes mais legíveis  
+- Permite criação rápida de novos fluxos
+
+---
+
+## Separação entre Testes e Helpers
+
+Para manter os testes enxutos, a lógica compartilhada foi separada em módulos auxiliares:
+
+- `assertions.ts` → verificações reutilizáveis  
+- `navigation.ts` → funções de navegação comuns  
+- `testData.ts` → massa de dados isolada  
+
+**Vantagens:**  
+- Testes focados no comportamento e não em detalhes técnicos  
+- Menos repetição de código  
+- Manutenção mais simples
+
+---
+
+## Configurações Reaproveitáveis
+
+A configuração global em `playwright.config.ts` centraliza os parâmetros compartilhados por todas as suites:
+
+- URL base  
+- Timeout padrão  
+- Reporter configurado  
+- Browsers de execução  
+- Diretórios de evidências  
+
+Isso garante que todos os testes:
+
+- Sigam o mesmo padrão de execução  
+- Sejam reproduzíveis em qualquer ambiente  
+- Rodem em CI/CD sem ajustes manuais
+
+A combinação de Page Objects, helpers e configuração centralizada garante uma arquitetura simples, escalável e estável.
+
+# 7. Como Executar (Reprodutibilidade)
 
 ### Pré-requisitos
 - Node.js 18+  
@@ -100,7 +212,7 @@ Todos os testes rodam sem intervenção manual.
 
 ---
 
-# 6. Evidências de Execução
+# 8. Evidências de Execução
 
 As evidências completas encontram-se em:
 
