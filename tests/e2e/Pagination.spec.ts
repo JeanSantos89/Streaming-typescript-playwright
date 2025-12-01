@@ -3,7 +3,7 @@ import { PaginationPage } from '../../src/pages/PaginationPage';
 import { AuthPage } from '../../src/pages/AuthPage';
 
 
-test('E2E - Logado, realizar Scroll e paginação dos filmes (3 listas)', async ({ page }) => { //CT012
+test('E2E - Logado, realizar Scroll e paginação dos filmes (3 listas)', async ({ page }) => { //CT06
   const home = new PaginationPage(page);
   await home.goto();
   await home.expectLoaded();
@@ -11,7 +11,7 @@ test('E2E - Logado, realizar Scroll e paginação dos filmes (3 listas)', async 
   await home.Pagination();
 });
 
-test('E2E - Deslogado, realizar Scroll e paginação dos filmes (3 listas)', async ({ page }) => { //CT013
+test('E2E - Deslogado, realizar Scroll e paginação dos filmes (3 listas)', async ({ page }) => { //CT07
   const home = new PaginationPage(page);
   await home.goto();
   await home.expectLoaded();

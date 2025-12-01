@@ -20,11 +20,9 @@ export class AuthPage {
   async Auth() {
     await this.el.loginButton.click();
     await this.page.waitForLoadState('load');
-
     await this.el.usernameInput.fill(process.env.TMDB_USERNAME as string);
     await this.el.passwordInput.fill(process.env.TMDB_PASSWORD as string);
     await this.el.submitButton.click();
-
     await this.page.waitForSelector('a.logged_in[href^="/u/"]');
   }
 

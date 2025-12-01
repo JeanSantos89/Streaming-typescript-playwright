@@ -9,7 +9,6 @@ export class BasePage {
     this.testInfo = testInfo;
   }
 
-  //egistra um passo com screenshot de evidência.
   protected async step(name: string, action: () => Promise<void>) {
     await action();
 
