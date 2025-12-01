@@ -1,152 +1,142 @@
-1. Visão Geral
+# README do Candidato
 
-Este projeto implementa uma suíte de testes automatizados end-to-end utilizando Playwright, cobrindo cenários comuns de plataformas de streaming: navegação de catálogo, filtros, ranking e interações com seções específicas do site.
-A solução foi construída seguindo boas práticas de arquitetura de testes, isolamento de responsabilidades e reprodutibilidade.
+Este repositório contém uma automação E2E utilizando Playwright e TypeScript.  
+O objetivo é demonstrar organização, priorização e entrega de cenários reprodutíveis, utilizando uma fonte pública (TMDB) para evitar exposição de dados ou dependência de ambientes corporativos da WATCH.
 
-A trilha utilizada foi baseada no TMDB, por oferecer um domínio público, estável e representativo do fluxo de consumo de conteúdo sem riscos de exposição de dados sensíveis.
+A automação cobre fluxos essenciais, com destaque para **exibição de detalhes de conteúdos**, pesquisas e navegação geral.
 
-2. Escopo Implementado
-2.1 Fluxos automatizados
+---
 
-Foram implementados os seguintes testes:
+# 1. Visão Geral do que foi Implementado
 
-Smoke Test: validações gerais de navegação, disponibilidade e carregamento da página inicial.
+Os testes incluem:
 
-Testes de Interesses: verificação do carregamento da página, interações e comportamentos esperados.
+- Login e logout  
+- Paginação e ranking (logado e deslogado)  
+- Pesquisas (falha, parcial e sucesso)  
+- Validação completa do carregamento da Home  
+- **Exibição de detalhes de conteúdos (CT14)** — cenário de maior relevância, pois simula diretamente o comportamento do usuário final em plataformas de streaming  
 
-Testes de Filtros de Filmes: aplicação de filtros, validação da mudança de resultados, comportamento negativo e consistência das listagens.
+Os testes foram organizados por páginas e responsabilidades, seguindo padrão POM.
 
-Testes de Ranking: navegação para rankings, validação de ordenação e integridade das informações exibidas.
+---
 
-2.2 Arquitetura e Organização
+# 2. Catálogo de Casos de Teste (CT01–CT14)
 
-A automação foi desenvolvida utilizando o padrão Page Object Model (POM), com os seguintes componentes:
+## Remoções solicitadas
+Foram removidos completamente os cenários:
 
-pages/: abstrações de páginas contendo métodos de interação.
+- CT03  
+- CT04  
+- CT05  
 
-elements/: centralização de seletores e locators.
+Para manter foco e priorização mínima conforme enunciado.
 
-utils/: funções de navegação padrão, assertions reutilizáveis e massa de dados.
+---
 
-tests/: suíte de testes organizada por contexto.
+## Casos de Teste Atuais
 
-playwright.config.ts: configuração de ambiente, evidências e relatórios.
+| CT  | Página          | Nome                         | Contexto      | Descrição |
+|-----|-----------------|------------------------------|----------------|-----------|
+| CT01 | AuthPage | Login | Deslogado | Realizar login básico. |
+| CT02 | AuthPage | Login + Logout | Logado | Validar fluxo completo de login/logout. |
+| CT06 | PaginationPage | Pagination | Logado | Realizar scroll + paginação de 3 listas. |
+| CT07 | PaginationPage | Pagination | Deslogado | Realizar scroll + paginação sem login. |
+| CT08 | RankingPage | RankingActionsLogged | Logado | Acessar ranking autenticado. |
+| CT09 | RankingPage | RankingActionsUnlogged | Deslogado | Acessar ranking sem login. |
+| CT10 | HomePage | SearchFail | Geral | Buscar termo inexistente. |
+| CT11 | HomePage | SearchHalf | Geral | Pesquisa parcial. |
+| CT12 | HomePage | ExpectLoaded | Geral | Validar carregamento da Home. |
+| CT13 | HomePage | SearchSuccess | Geral | Pesquisa básica com retorno. |
+| CT14 | HomePage | MoviesCategoria | Geral | **Exibir detalhes completos de um conteúdo.** |
 
-Essa abordagem facilita a manutenção, expansão e entendimento da automação.
+---
 
-3. Estrutura do Projeto
-/
-├── tests/
-│   ├── smoke.spec.ts
-│   ├── Interest.spec.ts
-│   ├── MovieFilter.spec.ts
-│   ├── Ranking.spec.ts
-│
-├── pages/
-│   ├── MoviesPage.ts
-│   ├── RankingPage.ts
-│
-├── elements/
-│   ├── InterestElements.ts
-│   ├── RankingElements.ts
-│
-├── utils/
-│   ├── navigation.ts
-│   ├── assertions.ts
-│   ├── testData.ts
-│
-├── playwright.config.ts
-├── package.json
-└── README-candidato.md
+# 3. Ênfase no Cenário CT14 – Exibir Detalhes de Conteúdos
 
-4. Evidências de Execução
+O teste **CT14 – MoviesCategoria** foi tratado como cenário de alta prioridade, pois:
 
-As evidências de execução são geradas automaticamente durante os testes e disponibilizadas na pasta:
+- É uma ação presente em qualquer plataforma de streaming real.
+- Envolve múltiplos elementos essenciais: imagem, título, sinopse, avaliações, categorias e botões de interação.
+- Valida a integridade da navegação interna do catálogo.
+- É um fluxo crítico para avaliar a estabilidade da interface.
+- É o tipo de ação que mais representa o comportamento real do usuário.
 
-evidence/
+O teste confirma que o usuário consegue:
 
-Conteúdo das evidências
+- Navegar até uma categoria ou lista
+- Selecionar um filme ou série
+- Carregar a página de detalhes
+- Validar elementos essenciais visíveis
 
-Relatório HTML
-Local: evidence/report/index.html
+Esse fluxo garante que toda a jornada de navegação e descoberta de conteúdo está funcional.
 
-Screenshots
-Gerados automaticamente em caso de falha.
+---
 
-Vídeos de execução
-Gravados em caso de falha.
+# 4. Por que Playwright e TypeScript?
 
-Arquivos de trace
-Registrados na primeira tentativa de retry.
+## 4.1 Por que Playwright?
+Playwright foi escolhido por:
 
-Artefatos gerais
-Armazenados em: evidence/test-results/
+- suportar múltiplos browsers de forma nativa (Chromium, Firefox, WebKit);  
+- oferecer isolamento real entre testes (contextos independentes);  
+- permitir **storageState** para testes logados sem repetir login;  
+- possuir ótimo sistema de evidências (vídeo, trace, screenshots);  
+- ter API moderna, estável e simples;  
+- executar rápido e com paralelismo otimizado;  
+- ser mais consistente que Selenium e Cypress em sites altamente dinâmicos.
 
-Como abrir o relatório
-npx playwright show-report evidence/report
+Playwright hoje é referência para automações **E2E modernas**.
 
-5. Como Executar
-5.1 Instalar dependências
+## 4.2 Por que TypeScript?
+TypeScript foi escolhido porque:
+
+- reduz erros comuns via tipagem estática;  
+- facilita manutenção dos Page Objects (intellisense completo);  
+- melhora leitura, escalabilidade e segurança do código;  
+- é padrão atual em projetos modernos, especialmente os que usam Playwright;  
+- elimina problemas de valores indefinidos, tipos incorretos e retorno inesperado.  
+
+A combinação Playwright + TypeScript garante **confiabilidade, velocidade e qualidade**.
+
+---
+
+# 5. Como Executar (Reprodutibilidade)
+
+### Pré-requisitos
+- Node.js 18+  
+- npm instalado  
+
+### Instalar dependências
+```
 npm install
+```
 
-5.2 Instalar navegadores do Playwright
+### Instalar navegadores
+```
 npx playwright install
+```
 
-5.3 Executar a suíte completa
+### Executar todos os testes
+```
 npx playwright test
+```
 
-5.4 Abrir relatório HTML
+### Abrir relatório
+```
 npx playwright show-report evidence/report
+```
 
-6. Registro Automático de Evidências
+Todos os testes rodam sem intervenção manual.
 
-O projeto está configurado para registrar e armazenar evidências de forma automática.
+---
 
-Trecho relevante da configuração:
+# 6. Evidências de Execução
 
-use: {
-  screenshot: 'only-on-failure',
-  trace: 'on-first-retry',
-  video: 'retain-on-failure'
-},
-reporter: [
-  ['html', { open: 'never', outputFolder: 'evidence/report' }],
-  ['list']
-],
-outputDir: 'evidence/test-results'
+As evidências completas encontram-se em:
 
+```
+evidence/
+```
 
-Essa configuração garante que:
-
-Testes falhos possuam screenshots, vídeos e traces associados.
-
-O relatório HTML seja gerado em pasta separada.
-
-Todos os artefatos de execução fiquem centralizados e organizados.
-
-7. Decisões de Escopo
-
-A trilha TMDB foi escolhida por ser pública, fornecer uma estrutura estável e representar adequadamente um fluxo de exploração de catálogo similar a plataformas de streaming.
-
-Os cenários relacionados a catálogo, ranking e filtros foram priorizados por serem áreas de alto impacto em plataformas de mídia.
-
-A arquitetura foi planejada com foco em reuso, clareza e escalabilidade.
-
-8. Limitações e Próximos Passos
-8.1 Limitações
-
-O TMDB, por ser público, pode sofrer alterações visuais que exijam pequenos ajustes nos seletores.
-
-Fluxos autenticados não foram incluídos neste escopo por não serem essenciais ao objetivo proposto.
-
-8.2 Possíveis evoluções
-
-Implementação de testes visuais usando comparações de snapshots.
-
-Configuração de execução paralela otimizada.
-
-Criação de mocks locais para cenários controlados e previsíveis.
-
-Integração com pipeline de CI/CD.
-
-Ampliação da cobertura de testes para diferentes dispositivos e modos de visualização.
+- Relatório HTML → `evidence
