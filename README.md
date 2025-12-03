@@ -186,7 +186,7 @@ A combinação de Page Objects, helpers e configuração centralizada garante um
 
 ### Pré-requisitos
 - Node.js 18+  
-- npm instalado  
+- npm instalado
 
 ### Instalar dependências
 ```
@@ -196,6 +196,11 @@ npm install
 ### Instalar navegadores
 ```
 npx playwright install
+```
+
+### Inserir conta válida para acesso
+```
+.env.example
 ```
 
 ### Executar todos os testes
