@@ -216,7 +216,7 @@ npx playwright install
 
 ## Configurar ambiente
 
-Preencher dados válidos em `.env`.
+Preencher dados válidos em `.env.example`
 
 ## Executar todos os testes
 
