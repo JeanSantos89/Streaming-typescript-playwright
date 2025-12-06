@@ -15,6 +15,25 @@ export class AuthPage {
   async goto() {
     await this.page.goto('/');
     await this.page.waitForLoadState('load');
+
+    // Fechar o banner de cookies (se presente), evita blocos no fluxo de login
+    const cookieSelectors = [
+      'text=Aceitar todos os cookies',
+      'text=Accept all cookies',
+      'button#onetrust-accept-btn-handler',
+      'text=Aceitar todos'
+    ];
+    for (const sel of cookieSelectors) {
+      try {
+        const btn = this.page.locator(sel);
+        if ((await btn.count()) && (await btn.isVisible())) {
+          await btn.click();
+          break;
+        }
+      } catch (e) {
+        // ignorar e tentar próximo seletor
+      }
+    }
   }
 
   async Auth() {

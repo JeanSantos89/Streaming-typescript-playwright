@@ -1,0 +1,99 @@
+    <div id="results_page_1" class="results_page true">
+      <div id="63b64af93344c600c97dfd9d" class="card v4" data-object-id="63b64af93344c600c97dfd9d">
+  <div class="image">
+    <div class="poster glyphicons_v2 picture grey poster no_image_holder">
+      <a href="/movie/1069905-jay-kelly">
+              <img loading="lazy" class="poster w-full" src="https://media.themoviedb.org/t/p/w220_and_h330_face/jasFpJCOG3FoXKv9IErzWCnZJor.jpg" srcset="https://media.themoviedb.org/t/p/w220_and_h330_face/jasFpJCOG3FoXKv9IErzWCnZJor.jpg 1x, https://media.themoviedb.org/t/p/w440_and_h660_face/jasFpJCOG3FoXKv9IErzWCnZJor.jpg 2x" alt="Jay Kelly">
+
+      </a>
+    </div>
+  </div>
+
+  <div class="details">
+    <div class="flex_space_between">
+      <div class="wrapper">
+        <div class="consensus tight">
+          <div class="outer_ring">
+            <div class="user_score_chart 63b64af93344c600c97dfd9d" data-percent="59" data-track-color="#423d0f" data-bar-color="#d2d531">
+              <div class="percent">
+                  <span class="icon icon-r59"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="title">
+          <div>
+            <a href="/movie/1069905-jay-kelly"><h2>Jay Kelly</h2></a>
+          </div>
+
+            <span class="release_date">20 de novembro de 2025</span>
+        </div>
+      </div>
+
+      <div class="overview true">
+          <p>O astro do cinema Jay Kelly confronta seu passado e seu presente em uma jornada caótica pela Europa com seu dedicado agente. Ao longo do caminho, os dois precisam confrontar os relacionamentos com pessoas queridas e o legado que vão deixar.</p>
+      </div>
+    </div>
+
+      <div class="action_bar">
+        <ul>
+          <li id="rating_63b64af93344c600c97dfd9d" class="default">
+            <a class="list_item_rating no_click" data-list-type="rating" data-rating-url="/movie/1069905/remote/rating" data-media-card="card_movie_63b64af93344c600c97dfd9d" data-media-type="movie" data-media-id="63b64af93344c600c97dfd9d" href="/u/JeanSantos782/watchlist">
+              <span class="rating wrapper">
+                <span class="value"></span>
+                <span class="glyphicons_v2 star"></span>
+              </span>
+                <span class="text">Avalie!</span>
+            </a>
+          </li>
+          <li id="favourite_63b64af93344c600c97dfd9d">
+            <a class="account_list_action no_click " data-list-type="favourite" data-media-card="card_movie_63b64af93344c600c97dfd9d" data-media-type="movie" data-media-id="63b64af93344c600c97dfd9d" href="/u/JeanSantos782/watchlist/toggle">
+              <span id="favourite_63b64af93344c600c97dfd9d" class="favourite wrapper">
+                <span class="glyphicons_v2 heart"></span>
+              </span> Adicionar aos favoritos
+            </a>
+          </li>
+          <li>
+            <a class="add_media_to_list no_click" data-list-type="list" data-media-type="movie" data-media-id="1069905" href="/u/JeanSantos782/remote/lists?media_type=movie&media_id=1069905&media_title=Jay Kelly">
+              <span class="list wrapper">
+                <span class="glyphicons_v2 list"></span>
+              </span> Adicionar a uma lista
+            </a>
+          </li>
+            <li>
+              <a class="account_list_action no_click" data-list-type="watchlist" data-remove="true" data-media-card="card_movie_63b64af93344c600c97dfd9d" data-media-type="movie" data-media-id="63b64af93344c600c97dfd9d" href="/u/JeanSantos782/watchlist/toggle">
+                <span class="remove wrapper">
+                  <span class="glyphicons_v2 menu-close"></span>
+                </span> Remover
+              </a>
+            </li>
+        </ul>
+      </div>
+  </div>
+</div>
+
+
+</div>
+
+<script>
+  $(function() {
+    $('div.card .user_score_chart').each(function(i) {
+      var item = $(this);
+      item.easyPieChart({
+        lineCap: parseFloat(item.data("percent")) == 0.0 ? "butt" : "round",
+        lineWidth: 2,
+        scaleColor: false,
+        size: 34,
+        animate: {
+          enabled: false
+        }
+      });
+    });
+
+      enableLoggedInAccountTooltipActions('JeanSantos782');
+      togglePageAccountStatus('JeanSantos782', '#results_page_1', 'Avalie!', 'Sua avaliação');
+      attachListTooltip(mobileDevice);
+  });
+</script>
+

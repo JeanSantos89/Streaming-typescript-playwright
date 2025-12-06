@@ -10,7 +10,6 @@ test('E2E - Logado, realizar Scroll e paginação dos filmes (3 listas)', async 
   await home.Auth();
   await home.Pagination();
 });
-
 test('E2E - Deslogado, realizar Scroll e paginação dos filmes (3 listas)', async ({ page }) => { //CT07
   const home = new PaginationPage(page);
   await home.goto();
