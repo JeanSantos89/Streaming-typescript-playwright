@@ -11,6 +11,7 @@ export class MoviesElements {
   readonly AgeRangeFilter: Locator;
   readonly LanguageFilter: Locator;
   readonly FilterBtn: Locator;
+  readonly userLogged: Locator;
 
   constructor(page: Page) {
     this.logoHome = page.locator('a.logo');
@@ -23,5 +24,6 @@ export class MoviesElements {
     this.AgeRangeFilter = page.locator('#certification li[data-value="18"]');
     this.LanguageFilter = page.locator('.k-input-value-text').nth(3);
     this.FilterBtn = page.locator('p.load_more a.load_more').first();
+    this.userLogged = page.locator('li.user');
   }
 }

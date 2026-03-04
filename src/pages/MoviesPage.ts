@@ -35,7 +35,7 @@ export class MoviesPage extends AuthPage {
     await this.moviesEl.AdventureGenere.click();
     await this.moviesEl.ActionGenere.click();
     await this.moviesEl.AgeRangeFilter.click();
-
+    
     await this.moviesEl.LanguageFilter.click();
     await this.page.waitForTimeout(500);
     // Aguarda o dropdown estar visível

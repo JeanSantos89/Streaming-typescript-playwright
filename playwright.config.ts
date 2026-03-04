@@ -1,8 +1,15 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 dotenv.config();
 
 export default defineConfig({
+  projects: [
+    {
+      name: 'chromium',
+      use: { browserName: 'chromium' },
+    },
+  ],
+
   testDir: './tests',
   timeout: 120_000,
   retries: 2,
@@ -10,9 +17,9 @@ export default defineConfig({
   use: {
     baseURL: 'https://www.themoviedb.org',
     headless: true,
-    screenshot: 'on',
-    video: 'on',
-    trace: 'on',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
 
     // 🔹 Ou, se quiser focar só em falha (já está assim hoje):
     //screenshot: 'only-on-failure',
