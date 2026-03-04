@@ -30,7 +30,9 @@ jobs:
       - name: Run tests
         env:
           CI: true
-          BASE_URL: "https://www.themoviedb.org"  # URL base usada nos testes
+          BASE_URL: "https://www.themoviedb.org"
+          TMDB_USERNAME: ${{ secrets.TMDB_USERNAME }}
+          TMDB_PASSWORD: ${{ secrets.TMDB_PASSWORD }}
         run: npx playwright test
         # se você configurou projects no config (por ex. apenas chromium)
         # este comando já respeitará. Pode passar --browser=chromium se

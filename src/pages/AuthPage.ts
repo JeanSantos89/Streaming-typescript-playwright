@@ -37,6 +37,11 @@ export class AuthPage {
   }
 
   async Auth() {
+    console.log('🔐 Credenciais carregadas:', {
+      username: process.env.TMDB_USERNAME ? '✅ definido' : '❌ indefinido',
+      password: process.env.TMDB_PASSWORD ? '✅ definido' : '❌ indefinido',
+    });
+
     await this.el.loginButton.click();
     await this.page.waitForLoadState('load');
     await this.el.usernameInput.fill(process.env.TMDB_USERNAME as string);
