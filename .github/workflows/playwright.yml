@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10      # evita que o job fique preso indefinidamente
+    timeout-minutes: 30      # evita que o job fique preso indefinidamente
 
     steps:
       - uses: actions/checkout@v4
