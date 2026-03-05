@@ -17,18 +17,40 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
 
-    # Customize this step as needed
-    - name: Build application
-      run: npx run build
+      - name: Build application
+        run: npm run build
+
+      # ✅ Rode os testes (ajuste o script se você usa outro comando)
+      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          # Se seus testes usam essas envs (pelo log, sim):
+          TMDB_USER: ${{ secrets.TMDB_USER }}
+          TMDB_PASSWORD: ${{ secrets.TMDB_PASSWORD }}
+          # Opcional (alguns projetos usam isso pra mudar comportamento no CI)
+          CI: true
+
+      # ✅ Sempre sobe os artefatos, mesmo se os testes falharem
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            evidence/
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 7
