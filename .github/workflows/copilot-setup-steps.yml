@@ -32,25 +32,39 @@ jobs:
       - name: Build application
         run: npm run build
 
-      # ✅ Rode os testes (ajuste o script se você usa outro comando)
       - name: Run Playwright tests
         run: npx playwright test
         env:
-          # Se seus testes usam essas envs (pelo log, sim):
+          CI: true
+          BASE_URL: https://www.themoviedb.org
           TMDB_USER: ${{ secrets.TMDB_USER }}
           TMDB_PASSWORD: ${{ secrets.TMDB_PASSWORD }}
-          # Opcional (alguns projetos usam isso pra mudar comportamento no CI)
-          CI: true
 
-      # ✅ Sempre sobe os artefatos, mesmo se os testes falharem
-      - name: Upload Playwright artifacts
+      # 🔎 Debug: confirma que os arquivos existem (útil quando der "não achei")
+      - name: List Playwright evidence files
+        if: always()
+        run: |
+          echo "PWD: $(pwd)"
+          ls -la
+          echo "---- evidence ----"
+          find evidence -maxdepth 5 -type f | sed -n '1,200p'
+
+      # ✅ Upload: é AQUI que vai aparecer em "Artifacts" no run
+      - name: Upload Playwright evidence (screenshots/videos/traces)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-artifacts
-          path: |
-            evidence/
-            playwright-report/
-            test-results/
+          name: playwright-evidence
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 7
+
+      # (Opcional) Se você também quiser subir report HTML quando existir
+      - name: Upload Playwright HTML report (if any)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
           if-no-files-found: warn
           retention-days: 7
