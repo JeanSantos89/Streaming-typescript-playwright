@@ -1,6 +1,3 @@
-import { Page } from '@playwright/test';
-
-export async function navigateTo(page: Page, path: string) {
-  await page.goto(path);
-  await page.waitForLoadState('load');
-}
+// Navigation utilities are provided by BasePage.navigateTo().
+// Import BasePage and extend it in your page objects instead of using this module.
+export {};

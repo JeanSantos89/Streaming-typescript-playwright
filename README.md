@@ -1,248 +1,218 @@
-Este repositório contém uma automação E2E completa utilizando Playwright e TypeScript, desenvolvida com foco em organização, confiabilidade, performance e reprodutibilidade.  
-O objetivo é demonstrar boas práticas modernas de QA Engineering, utilizando a plataforma Open-Source TMDB.
+# Streaming Automation — TMDB E2E Test Suite
 
-A automação cobre os fluxos essenciais de uma plataforma de streaming, incluindo:
-
-- Autenticação e gerenciamento de sessão
-- Paginação e carregamento incremental
-- Ranking e filtros
-- Pesquisa (fluxos positivos e negativos)
-- Renderização completa da Home
-- Exibição de detalhes de conteúdo
-- Listas personalizadas (interesses)
-
-O projeto segue arquitetura modular utilizando Page Object Model (POM), comandos reutilizáveis, helpers e configuração centralizada, garantindo baixo acoplamento e alta manutenibilidade.
+Playwright + TypeScript end-to-end automation suite for [The Movie Database (TMDB)](https://www.themoviedb.org), covering authentication, search, ranking, filtering, watchlist management, and pagination.
 
 ---
 
-# 1. Visão Geral do que foi Implementado
+## Tech Stack
 
-A suíte cobre comportamentos críticos da jornada do usuário, como:
-
-- Login e logout com validação de sessão
-- Paginação dinâmica (scroll infinito)
-- Ranking logado e deslogado
-- Pesquisas com múltiplos cenários
-- Validações de carregamento da Home
-- Exibição de detalhes de conteúdos
-- Ações de interesse (CRUD)
-
-Organização padronizada via POM, facilitando expansão contínua.
+| Tool | Version | Purpose |
+|------|---------|---------|
+| [Playwright](https://playwright.dev) | ^1.57.0 | Browser automation |
+| TypeScript | via `@types/node` | Type safety |
+| Node.js | 18+ | Runtime |
+| dotenv | ^17.2.3 | Environment variable management |
 
 ---
 
-# 2. Catálogo de Casos de Teste (CT01–CT14)
+## Project Structure
 
-| CT | Página | Nome | Contexto | Descrição |
-|----|--------|--------|-----------|--------------|
-| CT01 | AuthPage | Login | Deslogado | Realizar login básico. |
-| CT02 | AuthPage | Login + Logout | Logado | Fluxo completo de autenticação. |
-| CT03 | InterestPage | InterestActions | Logado | CRUD de itens de interesse. |
-| CT04 | MoviesPage | RankingFilter | Logado | Aplicar filtros e validar resultados. |
-| CT05 | MoviesPage | RankingFilter | Deslogado | Filtros sem login. |
-| CT06 | PaginationPage | Pagination | Logado | Scroll + 3 listas paginadas. |
-| CT07 | PaginationPage | Pagination | Deslogado | Scroll + paginação pública. |
-| CT08 | RankingPage | RankingActionsLogged | Logado | Ranking autenticado. |
-| CT09 | RankingPage | RankingActionsUnlogged | Deslogado | Ranking público. |
-| CT10 | HomePage | SearchFail | Geral | Pesquisa sem resultados. |
-| CT11 | HomePage | SearchHalf | Geral | Pesquisa parcial. |
-| CT12 | HomePage | ExpectLoaded | Geral | Carregamento completo da Home. |
-| CT13 | HomePage | SearchSuccess | Geral | Busca com retorno. |
-| CT14 | HomePage | MoviesCategoria | Geral | Exibir detalhes de conteúdo. |
-
----
-
-# 3. Importância Técnica de Cada Caso de Teste
-
-### CT01 – Login
-- Valida fluxo de autenticação.
-- Base para todos os cenários logados.
-
-### CT02 – Login + Logout
-- Valida ciclo completo de sessão.
-- Evita sessão fantasma.
-
-### CT03 – InterestActions
-- Navega pelo site, adiciona conteúdo a lista de favoritos e o remove.
-
-### CT04/CT05 – Ranking + Filtros
-- Valida lógica combinada de filtros e ordenação.
-
-### CT06/CT07 – Paginação
-- Testa comportamento do infinite scroll.
-- Garante carregamento incremental sem travamentos.
-- Avalia performance e estabilidade da interface.
-
-### CT08/CT09 – Ranking
-- Confirma comportamento de seleção de ranking.
-
-### CT10 – Busca sem resultado
-- Valida comportamento de empty state.
-- Testa clareza das mensagens e fallback.
-
-### CT11 – Busca parcial
-- Exercita heurísticas de pesquisa.
-- Valida responsividade com termos incompletos.
-
-### CT12 – Carregamento da Home
-- Confirma integridade de módulos principais.
-- Evita layout quebrado ou dados ausentes.
-
-### CT13 – Busca com retorno
-- Valida o fluxo central de descoberta de conteúdo.
-
-### CT14 – Detalhes do conteúdo
-- Testa renderização de sinopse, mídia e metadados.
+```
+.
+├── src/
+│   ├── elements/           # Locator classes (one per page area)
+│   │   ├── CommonElements.ts   # Shared locators (logo, nav, menu)
+│   │   ├── AuthElements.ts
+│   │   ├── HomeElements.ts
+│   │   ├── MoviesElements.ts
+│   │   ├── RankingElements.ts
+│   │   ├── InterestElements.ts
+│   │   └── PaginationElements.ts
+│   ├── pages/              # Page Object classes (actions + assertions)
+│   │   ├── BasePage.ts         # Shared navigation and interaction helpers
+│   │   ├── AuthPage.ts         # Login, logout, cookie banner
+│   │   ├── HomePage.ts         # Search flows, movie details
+│   │   ├── MoviesPage.ts       # Filter application
+│   │   ├── RankingPage.ts      # Top-rated navigation
+│   │   ├── InterestPage.ts     # Watchlist CRUD
+│   │   └── PaginationPage.ts   # Infinite scroll / load more
+│   ├── fixtures/
+│   │   └── testData.ts     # Test constants (movie names, dates, selectors)
+│   ├── utils/
+│   │   └── assertions.ts   # Custom assertion helpers
+│   └── globalSetup.ts      # Pre-run environment variable validation
+├── tests/
+│   ├── e2e/                # End-to-end test specs
+│   │   ├── auth.spec.ts        # CT01, CT02
+│   │   ├── Interest.spec.ts    # CT03
+│   │   ├── MovieFilter.spec.ts # CT05
+│   │   ├── Pagination.spec.ts  # CT06, CT07
+│   │   ├── ranking.spec.ts     # CT08, CT09
+│   │   └── search.spec.ts      # CT10, CT11
+│   ├── smoke/
+│   │   └── smoke.spec.ts       # CT12, CT13, CT14
+│   └── seed.spec.ts        # Sanity check
+├── evidence/               # Test artifacts (auto-generated)
+│   ├── report/             # HTML report
+│   └── test-results/       # Screenshots, videos, traces
+├── .github/workflows/      # CI/CD pipeline
+├── playwright.config.ts
+└── package.json
+```
 
 ---
 
-# 4. Por que Playwright e TypeScript?
+## Setup
 
-## 4.1 Por que Playwright?
-
-- Suporte nativo a múltiplos navegadores.
-- Contextos independentes por teste.
-- Excelente sistema de evidências (vídeo, trace, screenshots).
-- API moderna e estável.
-- Execução em paralelo com alta performance.
-- Maior estabilidade que outras ferramentas em aplicações dinâmicas.
-
-## 4.2 Por que TypeScript?
-
-- Tipagem estática reduz erros comuns.
-- IntelliSense robusto facilita manutenção dos Page Objects.
-- Código mais seguro, legível e escalável.
-- Evita problemas com valores indefinidos ou tipos incorretos.
-- É padrão moderno no ecossistema de automação com Playwright.
-
----
-
-# 5. Decisões de Escopo (Versão Ampliada e Técnica)
-
-## 5.1 Critérios Técnicos de Seleção de Cenários
-
-Foram priorizados cenários que:
-
-1. Exercitam fluxos críticos da plataforma: login, busca, ranking, navegação e detalhes.
-2. Têm maior impacto em caso de falha.
-3. Possuem alto retorno em automação, devido à repetição e previsibilidade.
-4. São estáveis e reprodutíveis utilizando dados do TMDB.
-5. Podem ser executados consistentemente em pipeline CI/CD.
-
-## 5.2 Exclusões Deliberadas do Escopo
-
-Não fazem parte do escopo inicial:
-
-- Testes de WebView ou comportamento nativo em mobile.
-- Testes suscetíveis a flakiness por alta dependência de eventos assíncronos.
-
-O objetivo foi manter a suíte determinística e livre de flutuações externas.
-
-## 5.3 Critérios de Reprodutibilidade
-
-O escopo foi definido para garantir:
-
-- Zero dependência de dados voláteis.
-- Execução repetível em qualquer ambiente.
-- Uso intensivo do auto-wait do Playwright para evitar flakiness.
-- Padronização via .env.example.
-
-## 5.4 Riscos Reduzidos Através do Escopo Selecionado
-
-- Quebra no fluxo principal da Home.
-- Falhas de autenticação e sessão.
-- Inconsistências entre catálogo público e logado.
-- Problemas de UX em estados vazios.
-- Falha no carregamento incremental.
-- Falhas na exibição de metadados do conteúdo.
-
-## 5.5 Alinhamento com Plataformas de Streaming Modernas
-
-O escopo cobre pilares essenciais usados por plataformas como Netflix, Disney+, Prime Video:
-
-| Pilar | Exemplo em Streaming | Cobertura no Projeto |
-|-------|-----------------------|------------------------|
-| Catálogo | Home, Browse | Home e Ranking |
-| Descoberta | Busca, sugestões | Busca parcial e completa |
-| Autenticação | Login, sessão | Login, logout |
-| Personalização | Minha lista | InterestActions |
-| Performance | Scroll infinito | Paginação logada e deslogada |
-
----
-
-# 6. Arquitetura e Organização do Código
-
-A automação utiliza:
-
-- Page Object Model (POM)
-- Commands reutilizáveis
-- Helpers de navegação, validação e dados
-- Configurações globais centralizadas
-
-## Estrutura principal
-
-- MoviesPage.ts  
-- RankingPage.ts  
-- InterestElements.ts  
-- RankingElements.ts  
-
-## Helpers
-
-- assertions.ts  
-- navigation.ts  
-- testData.ts  
-
-## Benefícios
-
-- Redução de duplicação de código.
-- Testes enxutos e focados no comportamento.
-- Fácil expansão do projeto.
-- Separação clara de responsabilidades.
-
----
-
-# 7. Como Executar
-
-## Pré-requisitos
+### Prerequisites
 
 - Node.js 18+
-- npm instalado
+- npm 9+
+- A [TMDB account](https://www.themoviedb.org/signup) with username and password
 
-## Instalação
+### Installation
 
+```bash
+# 1. Clone the repository
+git clone https://github.com/JeanSantos89/Streaming-typescript-playwright.git
+cd Streaming-typescript-playwright
+
+# 2. Install dependencies
 npm install
+
+# 3. Install Playwright browsers
 npx playwright install
+```
 
+### Environment Variables
 
-## Configurar ambiente
+Create a `.env` file in the project root:
 
-Preencher dados válidos em `.env.example`
+```env
+TMDB_USERNAME=your_username
+TMDB_PASSWORD=your_password
+```
 
-## Executar todos os testes
-
-npx playwright test
-
-
-## Abrir relatório
-
-npx playwright show-report
-
-
-Execução totalmente automatizada e reprodutível.
+> The `globalSetup` step validates these variables before any test runs and throws a clear error if they are missing.
 
 ---
 
-# 8. Evidências de Execução
+## Running Tests
 
-As evidências ficam no diretório:
+| Command | Description |
+|---------|-------------|
+| `npm test` | Run all tests (headless) |
+| `npm run test:headed` | Run all tests with browser UI visible |
+| `npm run test:smoke` | Run only smoke tests |
+| `npm run test:e2e` | Run only E2E tests |
+| `npm run test:debug` | Run in debug mode (step-by-step) |
+| `npm run test:report` | Open the last HTML report |
 
-evidence/
+### Run a specific test file
 
-Inclui em casos de falha:
+```bash
+npx playwright test tests/e2e/auth.spec.ts
+```
 
-- Vídeos
-- Traces
-- Screenshots
-- Relatório HTML completo
+### Run a specific test by title
+
+```bash
+npx playwright test -g "CT01"
+```
 
 ---
+
+## Test Coverage
+
+| ID | Suite | Description | Auth Required |
+|----|-------|-------------|:---:|
+| CT01 | E2E | Login com credenciais válidas | No |
+| CT02 | E2E | Login seguido de logout | No |
+| CT03 | E2E | Adicionar e remover item da watchlist | Yes |
+| CT05 | E2E | Aplicar filtros completos e verificar resultados | No |
+| CT06 | E2E | Scroll e paginação como usuário logado | Yes |
+| CT07 | E2E | Scroll e paginação como visitante | No |
+| CT08 | E2E | Visualizar ranking como usuário logado | Yes |
+| CT09 | E2E | Visualizar ranking como visitante | No |
+| CT10 | E2E | Pesquisa sem resultados | No |
+| CT11 | E2E | Pesquisa com termo parcial | No |
+| CT12 | Smoke | Home page carregada corretamente | No |
+| CT13 | Smoke | Pesquisa básica funcional | No |
+| CT14 | Smoke | Exibir detalhes de conteúdo | No |
+
+---
+
+## Architecture
+
+### Page Object Model (POM)
+
+The project uses a two-layer POM:
+
+```
+BasePage
+└── AuthPage          (login, logout, cookie banner)
+    ├── HomePage      (search, movie details)
+    ├── MoviesPage    (filter application)
+    ├── RankingPage   (top-rated navigation)
+    ├── InterestPage  (watchlist CRUD)
+    └── PaginationPage (load-more / infinite scroll)
+```
+
+**BasePage** provides protected helpers used by all pages:
+- `navigateTo(url)` — navigate and wait for load
+- `clickAndWait(locator)` — click and wait for load state
+- `fillAndSubmit(locator, text)` — fill input and press Enter
+- `expectVisible(locator)` — assert element visibility
+- `expectLoaded()` — assert nav bar is visible
+
+### Element Layer
+
+Each page has a corresponding `*Elements` class that centralizes all locators. Shared navigation locators (`logoHome`, `moviesBar`, `popular`) live in `CommonElements` and are extended by the relevant element classes, eliminating duplication.
+
+```
+CommonElements        (logoHome, moviesBar, popular)
+├── MoviesElements    (filter inputs, genre selectors)
+├── RankingElements   (extends CommonElements only)
+├── InterestElements  (watchlist buttons, profile links)
+└── PaginationElements (movie cards, load-more button)
+```
+
+---
+
+## Evidence & Artifacts
+
+On test failure, Playwright automatically captures:
+
+- **Screenshot** — full-page snapshot at the moment of failure
+- **Video** — recording of the entire test run
+- **Trace** — interactive timeline for debugging in [Playwright Trace Viewer](https://playwright.dev/docs/trace-viewer)
+
+All artifacts are saved to `evidence/test-results/`. The HTML report is generated at `evidence/report/`.
+
+---
+
+## CI/CD
+
+Tests run automatically on every push to `main` and on pull requests via GitHub Actions (`.github/workflows/playwright.yml`).
+
+Credentials are stored as repository secrets:
+- `TMDB_USERNAME`
+- `TMDB_PASSWORD`
+
+The HTML report and test artifacts are uploaded as workflow artifacts after each run.
+
+---
+
+## Troubleshooting
+
+**Tests fail with "Missing required environment variables"**
+→ Ensure your `.env` file exists and contains `TMDB_USERNAME` and `TMDB_PASSWORD`.
+
+**Cookie banner blocks test flow**
+→ `AuthPage.goto()` automatically dismisses the cookie consent banner before any interaction.
+
+**Flaky tests on CI**
+→ The config has `retries: 2` — each failing test is retried twice before being marked as failed.
+
+**Browsers not found**
+→ Run `npx playwright install` to download the required browser binaries.

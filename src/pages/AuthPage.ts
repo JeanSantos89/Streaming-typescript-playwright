@@ -1,59 +1,44 @@
 import { Page, expect } from '@playwright/test';
+import { BasePage } from './BasePage';
 import { AuthElements } from '../elements/AuthElements';
+import { cookieSelectors } from '../fixtures/testData';
 
-export class AuthPage {
-  readonly el: AuthElements;
+export class AuthPage extends BasePage {
+  protected readonly el: AuthElements;
 
-  constructor(protected page: Page) {
+  constructor(page: Page) {
+    super(page);
     this.el = new AuthElements(page);
   }
 
-  async expectLoaded() {
-    await expect(this.page.locator('nav')).toBeVisible();
-  }
-
   async goto() {
-    await this.page.goto('/');
-    await this.page.waitForLoadState('load');
-
-    // Fechar o banner de cookies (se presente), evita blocos no fluxo de login
-    const cookieSelectors = [
-      'text=Aceitar todos os cookies',
-      'text=Accept all cookies',
-      'button#onetrust-accept-btn-handler',
-      'text=Aceitar todos'
-    ];
-    for (const sel of cookieSelectors) {
-      try {
-        const btn = this.page.locator(sel);
-        if ((await btn.count()) && (await btn.isVisible())) {
-          await btn.click();
-          break;
-        }
-      } catch (e) {
-        // ignorar e tentar próximo seletor
-      }
-    }
+    await this.navigateTo('/');
+    await this.dismissCookieBanner();
   }
 
-  async Auth() {
-    console.log('🔐 Credenciais carregadas:', {
-      username: process.env.TMDB_USERNAME ? '✅ definido' : '❌ indefinido',
-      password: process.env.TMDB_PASSWORD ? '✅ definido' : '❌ indefinido',
-    });
-
+  async login() {
     await this.el.loginButton.click();
     await this.page.waitForLoadState('load');
-    await this.el.usernameInput.fill(process.env.TMDB_USERNAME as string);
-    await this.el.passwordInput.fill(process.env.TMDB_PASSWORD as string);
+    await this.el.usernameInput.fill(process.env.TMDB_USERNAME ?? '');
+    await this.el.passwordInput.fill(process.env.TMDB_PASSWORD ?? '');
     await this.el.submitButton.click();
     await this.page.waitForSelector('a.logged_in[href^="/u/"]');
   }
 
-  async AuthLogout() {
-    await this.Auth();
-    await this.el.perfil.click();
-    await this.el.logout.last().click();
-    await expect(this.el.logoutCheck).toBeVisible();
+  async loginAndLogout() {
+    await this.login();
+    await this.el.profileLink.click();
+    await this.el.logoutLink.last().click();
+    await expect(this.el.logoutConfirmation).toBeVisible();
+  }
+
+  private async dismissCookieBanner() {
+    for (const selector of cookieSelectors) {
+      const btn = this.page.locator(selector);
+      if ((await btn.count()) > 0 && (await btn.isVisible())) {
+        await btn.click();
+        return;
+      }
+    }
   }
 }

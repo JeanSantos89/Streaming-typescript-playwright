@@ -1,18 +1,21 @@
-import { test, Browser, chromium } from '@playwright/test';
+import { test } from '@playwright/test';
 import { PaginationPage } from '../../src/pages/PaginationPage';
-import { AuthPage } from '../../src/pages/AuthPage';
 
+test.describe('Paginação de Filmes', () => {
+  test('CT06 - Scroll e paginação como usuário logado', async ({ page }) => {
+    const paginationPage = new PaginationPage(page);
+    await paginationPage.goto();
+    await paginationPage.expectLoaded();
+    await paginationPage.login();
+    await paginationPage.navigateToMovies();
+    await paginationPage.loadMoviePages();
+  });
 
-test('E2E - Logado, realizar Scroll e paginação dos filmes (3 listas)', async ({ page }) => { //CT06
-  const home = new PaginationPage(page);
-  await home.goto();
-  await home.expectLoaded();
-  await home.Auth();
-  await home.Pagination();
-});
-test('E2E - Deslogado, realizar Scroll e paginação dos filmes (3 listas)', async ({ page }) => { //CT07
-  const home = new PaginationPage(page);
-  await home.goto();
-  await home.expectLoaded();
-  await home.Pagination();
+  test('CT07 - Scroll e paginação como visitante', async ({ page }) => {
+    const paginationPage = new PaginationPage(page);
+    await paginationPage.goto();
+    await paginationPage.expectLoaded();
+    await paginationPage.navigateToMovies();
+    await paginationPage.loadMoviePages();
+  });
 });

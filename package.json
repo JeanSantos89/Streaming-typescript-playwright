@@ -1,23 +1,23 @@
 {
   "name": "streaming-automation-tmdb",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Playwright E2E automation suite for TMDB (The Movie Database)",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:smoke": "npx playwright test tests/smoke",
+    "test:e2e": "npx playwright test tests/e2e",
+    "test:report": "npx playwright show-report evidence/report"
   },
-  "keywords": [],
+  "keywords": ["playwright", "typescript", "e2e", "automation", "tmdb"],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "@types/node": "^24.10.1"
-  },
-  "dependencies": {
+    "@types/node": "^24.10.1",
     "dotenv": "^17.2.3",
-    "install": "^0.13.0",
-    "npx": "^3.0.0",
     "playwright": "^1.57.0"
   }
 }

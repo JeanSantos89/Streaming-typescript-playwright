@@ -1,19 +1,11 @@
-import { test, Browser, chromium } from '@playwright/test';
+import { test } from '@playwright/test';
 import { MoviesPage } from '../../src/pages/MoviesPage';
-import { AuthPage } from '../../src/pages/AuthPage';
 
-
-/*test.only('E2E - Logado, usar o filtro completo e observar resultados', async ({ page }) => { //CT04
-  const home = new MoviesPage(page);
-  await home.goto();
-  await home.expectLoaded();
-  await home.Auth();
-  await home.RankingFilter();
-});*/
-
-test('E2E - Deslogado, usar o filtro completo e observar resultados', async ({ page }) => { //CT05
-  const home = new MoviesPage(page);
-  await home.goto();
-  await home.expectLoaded();
-  await home.RankingFilter();
+test.describe('Filtro de Filmes', () => {
+  test('CT05 - Aplicar filtros como visitante e verificar resultados', async ({ page }) => {
+    const moviesPage = new MoviesPage(page);
+    await moviesPage.goto();
+    await moviesPage.expectLoaded();
+    await moviesPage.applyFilters();
+  });
 });

@@ -1,25 +1,24 @@
-import { test, Browser, chromium } from '@playwright/test';
+import { test } from '@playwright/test';
 import { AuthPage } from '../../src/pages/AuthPage';
 
-test('E2E - Autenticação - Login', async ({ page }) => { //CT01
-  const home = new AuthPage(page);
-  await home.goto();
-  await home.expectLoaded();
-  await home.Auth();
-});
-
-test('E2E - Autenticado, realizar logout', async ({ browser }) => { //CT02
-  const context = await browser.newContext({
-    viewport: { width: 1920, height: 1080 } // Full HD
+test.describe('Autenticação', () => {
+  test('CT01 - Login com credenciais válidas', async ({ page }) => {
+    const authPage = new AuthPage(page);
+    await authPage.goto();
+    await authPage.expectLoaded();
+    await authPage.login();
   });
-  try {
-    const page = await context.newPage();
-    const home = new AuthPage(page);
-    await home.goto();
-    await home.expectLoaded();
-    await home.AuthLogout();
-  } finally {
-    // ✅ Garante que o contexto é fechado mesmo se algo der errado
-    await context.close();
-  }
+
+  test('CT02 - Login seguido de logout', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
+    try {
+      const page = await context.newPage();
+      const authPage = new AuthPage(page);
+      await authPage.goto();
+      await authPage.expectLoaded();
+      await authPage.loginAndLogout();
+    } finally {
+      await context.close();
+    }
+  });
 });

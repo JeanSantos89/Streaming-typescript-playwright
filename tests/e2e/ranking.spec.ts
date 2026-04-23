@@ -1,17 +1,18 @@
-import { test, Browser, chromium } from '@playwright/test';
+import { test } from '@playwright/test';
 import { RankingPage } from '../../src/pages/RankingPage';
 
-test('E2E - Ranking de filmes logado', async ({ page }) => { //CT08
-  const home = new RankingPage(page);
-  await home.goto();
-  await home.expectLoaded();
-  await home.RankingActionsLogged();
-});
+test.describe('Ranking de Filmes', () => {
+  test('CT08 - Visualizar ranking como usuário logado', async ({ page }) => {
+    const rankingPage = new RankingPage(page);
+    await rankingPage.goto();
+    await rankingPage.expectLoaded();
+    await rankingPage.viewRankingAsLoggedUser();
+  });
 
-test('E2E - Ranking de filmes deslogado', async ({ page }) => { //CT09
-  const home = new RankingPage(page);
-  await home.goto();
-  await home.expectLoaded();
-  await home.RankingActionsUnlogged();
+  test('CT09 - Visualizar ranking como visitante', async ({ page }) => {
+    const rankingPage = new RankingPage(page);
+    await rankingPage.goto();
+    await rankingPage.expectLoaded();
+    await rankingPage.viewRankingAsGuest();
+  });
 });
-

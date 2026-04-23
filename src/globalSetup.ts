@@ -1,34 +1,14 @@
-/**
- * Global setup de testes
- * Valida variáveis de ambiente críticas antes de qualquer teste rodar
- */
-
 export default async function globalSetup() {
-  console.log('\n🔍 Validando variáveis de ambiente...\n');
+  const required = ['TMDB_USERNAME', 'TMDB_PASSWORD'] as const;
+  const missing = required.filter((key) => !process.env[key]);
 
-  const requiredEnvVars = {
-    TMDB_USERNAME: process.env.TMDB_USERNAME,
-    TMDB_PASSWORD: process.env.TMDB_PASSWORD,
-  };
-
-  let hasErrors = false;
-
-  for (const [varName, varValue] of Object.entries(requiredEnvVars)) {
-    if (!varValue) {
-      console.error(`❌ ${varName} não está definido!`);
-      hasErrors = true;
-    } else {
-      console.log(`✅ ${varName} definido com sucesso`);
-    }
-  }
-
-  if (hasErrors) {
+  if (missing.length > 0) {
     throw new Error(
-      `\n⚠️  Variáveis de ambiente obrigatórias não definidas!\n` +
-      `Local: coloque no .env ou defina manualmente\n` +
-      `GitHub Actions: configure em Settings > Secrets > Actions\n`
+      `Missing required environment variables: ${missing.join(', ')}\n` +
+        'Local: define them in a .env file\n' +
+        'CI/CD: configure them in Settings > Secrets > Actions',
     );
   }
 
-  console.log('\n✨ Todas as variáveis obrigatórias foram validadas!\n');
+  console.log('Environment variables validated successfully.');
 }

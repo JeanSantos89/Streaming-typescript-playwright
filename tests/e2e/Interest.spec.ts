@@ -1,11 +1,11 @@
-import { test, Browser, chromium } from '@playwright/test';
-import { AuthPage } from '../../src/pages/AuthPage';
+import { test } from '@playwright/test';
 import { InterestPage } from '../../src/pages/InterestPage';
 
-test('E2E - Logado, adicionar a lista de interesses um filme ou série e remover', async ({ page }) => { //CT03
-  const home = new InterestPage(page);
-  await home.goto();
-  await home.expectLoaded();
-  await home.interestActions();
+test.describe('Lista de Interesses', () => {
+  test('CT03 - Adicionar e remover item da watchlist', async ({ page }) => {
+    const interestPage = new InterestPage(page);
+    await interestPage.goto();
+    await interestPage.expectLoaded();
+    await interestPage.manageWatchlist();
+  });
 });
-
