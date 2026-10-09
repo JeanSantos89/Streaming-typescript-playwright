@@ -18,6 +18,9 @@ export class HomePage extends BasePage {
   async searchSuccess() {
     await this.fillAndSubmit(this.el.searchInput, validMovie);
     await this.clickAndWait(this.el.firstSearchResult);
+    // "Pesquisa básica funcional" não provava nada depois do clique: se a
+    // busca não abrisse a página do filme, o teste passava do mesmo jeito.
+    await this.expectMovieDetails();
   }
 
   async searchFail() {

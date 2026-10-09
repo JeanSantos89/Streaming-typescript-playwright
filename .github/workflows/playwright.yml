@@ -2,7 +2,8 @@ name: Playwright Tests
 # nome que aparece na aba Actions
 #
 # Este repo não tem testes de API/backend (TMDB aqui é testado pela UI pública,
-# não pela API oficial). O gate fica dividido em 2 jobs:
+# não pela API oficial). O gate fica dividido em 3 jobs:
+#   - assert-quality-audit: audita os specs em si (gate estático, sem navegador)
 #   - e2e-guest: fluxos sem login (não precisa de secret, é o gate principal)
 #   - e2e-authenticated: fluxos que fazem login de verdade no TMDB (precisa de
 #     TMDB_USERNAME/TMDB_PASSWORD configurados em Settings > Secrets > Actions)
@@ -13,6 +14,30 @@ on:
     branches: [ "main" ]  # executar quando mr para main
 
 jobs:
+  assert-quality-audit:
+    name: Auditoria de qualidade dos testes (gate estático)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Não precisa de secret nem de rede do TMDB: só lê os .ts dos specs e das
+    # Page Objects. Roda independente dos outros dois jobs — se um teste
+    # passa mas não prova nada (sem expect, ou assert tautológico tipo
+    # expect(true).toBe(true)), este job falha mesmo que e2e-guest/
+    # e2e-authenticated fiquem verdes.
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit test quality
+        run: node scripts/audit-test-quality.js
+
   e2e-guest:
     name: E2E (visitante, sem login)
     runs-on: ubuntu-latest

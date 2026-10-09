@@ -193,8 +193,9 @@ All artifacts are saved to `evidence/test-results/`. The HTML report is generate
 
 ## CI/CD
 
-Tests run automatically on every push to `main` and on pull requests via GitHub Actions (`.github/workflows/playwright.yml`), split into two gates:
+Tests run automatically on every push to `main` and on pull requests via GitHub Actions (`.github/workflows/playwright.yml`), split into three gates:
 
+- **`assert-quality-audit`** — static check, no browser, no secrets. See [Test Quality Audit](#test-quality-audit) below.
 - **`e2e-guest`** — runs every spec that does not require a TMDB login (CT05, CT07, CT09, CT10, CT11, CT12, CT13, CT14, and the sanity check). No secret needed; this is the required gate for most PRs.
 - **`e2e-authenticated`** — runs the specs that perform a real TMDB login (CT01, CT02, CT03, CT06, CT08). It needs the repository secrets below and fails fast with a clear message if they are missing, instead of failing deep inside Playwright.
 
@@ -207,6 +208,40 @@ Credentials are stored as repository secrets (Settings > Secrets and variables >
 These must be a real TMDB account's username and password (not an API key) — the suite logs in through the website's login form.
 
 The HTML report and test artifacts are uploaded as workflow artifacts after each run, one set per job (`*-guest` / `*-authenticated`).
+
+---
+
+## Test Quality Audit
+
+A test that passes without actually checking anything is worse than no test: it
+looks like coverage but proves nothing. This repo has already shipped real
+selector bugs (TMDB's Kendo→Tailwind migration, a pagination bug, a geoIP bug
+in the movie filter) that slipped past a suite that was all green. Since then,
+every test in this repo has been reviewed by hand at least once to make sure
+it actually asserts something — but hand review doesn't scale and doesn't run
+on every PR.
+
+`scripts/audit-test-quality.js` is a static gate (no dependencies, no browser)
+that scans `tests/**/*.spec.ts` plus the Page Objects/Elements in `src/pages`
+and `src/elements`, and fails the build if it finds:
+
+- a `test(...)`/`it(...)` whose body has no real proof of anything — no direct
+  `expect(...)`, and no call to a Page Object method that itself contains an
+  `expect(...)` (the suite follows the Page Object Model, so most assertions
+  live inside page methods like `expectLoaded()`, not inline in the spec);
+- an obviously tautological assert: `expect(x).toBe(x)` with the identical
+  expression on both sides, or `expect(true).toBe(true)` /
+  `expect(true).toBeTruthy()` with a literal `true`.
+
+Run it locally with:
+
+```bash
+node scripts/audit-test-quality.js
+```
+
+It runs as its own CI job (`assert-quality-audit`), independent of the guest
+and authenticated E2E jobs, so a spec that is green for the wrong reason fails
+the build even if the browser run itself passes.
 
 ---
 

@@ -8,6 +8,7 @@ export class MoviesElements extends CommonElements {
   readonly ageRangeFilter: Locator;
   readonly languageFilter: Locator;
   readonly filterBtn: Locator;
+  readonly resultsContainer: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -23,5 +24,9 @@ export class MoviesElements extends CommonElements {
     this.ageRangeFilter = page.locator('#certification li').last();
     this.languageFilter = page.locator('.k-input-value-text').nth(3);
     this.filterBtn = page.locator('p.load_more a.load_more').first();
+    // Container que o TMDB sempre renderiza depois de aplicar filtro,
+    // tenha ou não resultado (com resultado tem cards, sem resultado tem o
+    // aviso "no results"). Provar que ele aparece prova que o filtro rodou.
+    this.resultsContainer = page.locator('#media-list, .no_results');
   }
 }

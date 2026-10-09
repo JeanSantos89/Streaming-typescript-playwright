@@ -30,5 +30,11 @@ export class MoviesPage extends AuthPage {
     await this.moviesEl.languageFilter.press('Enter');
 
     await this.clickAndWait(this.moviesEl.filterBtn);
+
+    // O teste se chama "...e verificar resultados", mas até aqui nada
+    // provava que o filtro de fato rodou (podia ter dado erro silencioso e
+    // deixado a tela antiga na tela). Prova mínima: o container de
+    // resultado do TMDB aparece, com cards ou com o aviso de "sem resultado".
+    await expect(this.moviesEl.resultsContainer.first()).toBeVisible({ timeout: 15000 });
   }
 }
