@@ -94,17 +94,16 @@ jobs:
   e2e-authenticated:
     name: E2E (autenticado, best-effort — não bloqueia o workflow)
     runs-on: ubuntu-latest
-    # Timeout curto de propósito: login real no TMDB (produção de terceiro)
-    # pode ser travado pelo bot-detection (AWS WAF) deles, sem sinal de erro
-    # nem de conclusão — já aconteceu 2x (ficou >15min parado em "Run
-    # authenticated tests" e precisou ser cancelado na mão). 5 minutos é
-    # tempo de sobra para um login real que funciona; se passar disso, é
-    # bloqueio do WAF, não lentidão do teste, e falhar rápido é melhor do
-    # que ficar pendurado até o timeout padrão de 1h.
-    timeout-minutes: 5
-    # Best-effort: uma falha aqui (inclusive timeout) não derruba o workflow
-    # geral. TMDB é produção de terceiro fora do nosso controle, e burlar a
-    # proteção anti-bot deles não é opção. Quem bloqueia de verdade é
+    # Rede de segurança no nível do job (não é o timeout "honesto" — esse é
+    # no step "Run authenticated tests" abaixo). timeout-minutes de JOB, se
+    # estourado, marca o job como "cancelled", e continue-on-error NÃO
+    # neutraliza cancelamento — só neutraliza failure. Por isso o timeout
+    # curto real fica no step, e este aqui é só para não deixar o job inteiro
+    # pendurado até 1h em caso de outro travamento (ex.: install de deps).
+    timeout-minutes: 15
+    # Best-effort: uma falha aqui não derruba o workflow geral. TMDB é
+    # produção de terceiro fora do nosso controle, e burlar a proteção
+    # anti-bot deles não é opção. Quem bloqueia de verdade é
     # assert-quality-audit e e2e-guest.
     continue-on-error: true
 
@@ -131,10 +130,18 @@ jobs:
           fi
 
       - name: Run authenticated tests
-        # Best-effort: timeout curto acima + continue-on-error no job inteiro
-        # existem porque este login é contra produção real do TMDB, que tem
-        # anti-bot ativo (AWS WAF). Já travou 2x sem dar sinal de erro. Este
-        # step pode falhar ou estourar o timeout sem derrubar o workflow.
+        # Timeout curto de propósito, aqui no STEP (não no job): login real
+        # no TMDB (produção de terceiro) pode ser travado pelo bot-detection
+        # (AWS WAF) deles, sem sinal de erro nem de conclusão — já aconteceu
+        # 2x (ficou >15min parado, precisou ser cancelado na mão). 5 minutos
+        # é tempo de sobra para um login real que funciona; se passar disso,
+        # é bloqueio do WAF, não lentidão do teste.
+        # continue-on-error aqui no step faz o step falhar como "failure"
+        # normal (não "cancelled" de timeout de job) e o job continua e
+        # fecha com sucesso — timeout de JOB vira "cancelled", que
+        # continue-on-error não neutraliza; por isso o timeout mora aqui.
+        timeout-minutes: 5
+        continue-on-error: true
         env:
           CI: true
           TMDB_USERNAME: ${{ secrets.TMDB_USERNAME }}
