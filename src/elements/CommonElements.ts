@@ -6,8 +6,10 @@ export class CommonElements {
   readonly popular: Locator;
 
   constructor(page: Page) {
-    this.logoHome = page.locator('a.logo');
-    this.moviesBar = page.locator('ul.dropdown_menu.navigation li').first();
-    this.popular = page.locator('ul.k-menu-group.k-menu-group-md > li').first();
+    this.logoHome = page.locator('a.logo').first();
+    this.moviesBar = page.locator('a.dropdown-menu-trigger[href="/movie"]');
+    this.popular = page.locator(
+      '.dropdown-menu-item:has(> a.dropdown-menu-trigger[href="/movie"]) .dropdown-menu-popup a',
+    ).first();
   }
 }

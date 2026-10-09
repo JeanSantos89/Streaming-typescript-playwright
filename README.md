@@ -193,13 +193,20 @@ All artifacts are saved to `evidence/test-results/`. The HTML report is generate
 
 ## CI/CD
 
-Tests run automatically on every push to `main` and on pull requests via GitHub Actions (`.github/workflows/playwright.yml`).
+Tests run automatically on every push to `main` and on pull requests via GitHub Actions (`.github/workflows/playwright.yml`), split into two gates:
 
-Credentials are stored as repository secrets:
+- **`e2e-guest`** — runs every spec that does not require a TMDB login (CT05, CT07, CT09, CT10, CT11, CT12, CT13, CT14, and the sanity check). No secret needed; this is the required gate for most PRs.
+- **`e2e-authenticated`** — runs the specs that perform a real TMDB login (CT01, CT02, CT03, CT06, CT08). It needs the repository secrets below and fails fast with a clear message if they are missing, instead of failing deep inside Playwright.
+
+This repo has no backend/API test layer — TMDB here is exercised through the public UI, not the official TMDB API, so there is no separate "API gate"; the authenticated job is the closest equivalent since it is the one gated by a credential.
+
+Credentials are stored as repository secrets (Settings > Secrets and variables > Actions):
 - `TMDB_USERNAME`
 - `TMDB_PASSWORD`
 
-The HTML report and test artifacts are uploaded as workflow artifacts after each run.
+These must be a real TMDB account's username and password (not an API key) — the suite logs in through the website's login form.
+
+The HTML report and test artifacts are uploaded as workflow artifacts after each run, one set per job (`*-guest` / `*-authenticated`).
 
 ---
 

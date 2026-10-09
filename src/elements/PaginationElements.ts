@@ -7,7 +7,7 @@ export class PaginationElements extends CommonElements {
 
   constructor(page: Page) {
     super(page);
-    this.movieCards = page.locator('.media_items .card.style_1');
+    this.movieCards = page.locator('#page_1 [data-object-id]:has(h2)');
     this.activeLoadMore = page.locator('.pagination.infinite:not(.hide) a.load_more');
   }
 }

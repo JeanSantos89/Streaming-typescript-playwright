@@ -33,14 +33,14 @@ export class HomePage extends BasePage {
 
     for (let i = 0; i < 3; i++) {
       const title = (
-        await this.el.searchMovieCards.nth(i).locator('.title h2').innerText()
+        await this.el.searchMovieCards.nth(i).locator('h2').innerText()
       ).toLowerCase();
       expect(title).toContain('for');
     }
   }
 
   async navigateToMoviesCategory() {
-    await this.el.movieMenuOption.click();
+    await this.el.movieMenuOption.hover();
     await expect(this.el.movieMenuFirstOption.first()).toBeVisible();
     await this.clickAndWait(this.el.movieMenuFirstOption.first());
     await this.clickAndWait(this.el.firstMovieCard);

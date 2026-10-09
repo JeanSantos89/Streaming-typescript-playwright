@@ -8,7 +8,7 @@ export class BasePage {
   }
 
   async expectLoaded() {
-    await expect(this.page.locator('nav')).toBeVisible();
+    await expect(this.page.locator('nav[role="menubar"]')).toBeVisible();
   }
 
   protected async navigateTo(url: string) {

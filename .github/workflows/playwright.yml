@@ -1,5 +1,11 @@
 name: Playwright Tests
 # nome que aparece na aba Actions
+#
+# Este repo não tem testes de API/backend (TMDB aqui é testado pela UI pública,
+# não pela API oficial). O gate fica dividido em 2 jobs:
+#   - e2e-guest: fluxos sem login (não precisa de secret, é o gate principal)
+#   - e2e-authenticated: fluxos que fazem login de verdade no TMDB (precisa de
+#     TMDB_USERNAME/TMDB_PASSWORD configurados em Settings > Secrets > Actions)
 
 on:
   pull_request:
@@ -7,7 +13,8 @@ on:
     branches: [ "main" ]  # executar quando mr para main
 
 jobs:
-  test:
+  e2e-guest:
+    name: E2E (visitante, sem login)
     runs-on: ubuntu-latest
     timeout-minutes: 30      # evita que o job fique preso indefinidamente
 
@@ -24,36 +31,87 @@ jobs:
         run: npm ci          # instala deps usando lockfile
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-        # essencial no runner Linux para ter chromium/firefox/webkit
+        run: npx playwright install --with-deps chromium
+        # essencial no runner Linux para ter o chromium
 
-      - name: Run tests
+      - name: Run guest-only tests
         env:
           CI: true
-          BASE_URL: "https://www.themoviedb.org"
+          # globalSetup exige as duas vars mesmo nos testes sem login;
+          # valor fictício é suficiente pois nenhum destes testes faz login de fato.
+          TMDB_USERNAME: guest-gate-placeholder
+          TMDB_PASSWORD: guest-gate-placeholder
+        run: npx playwright test --grep-invert "logado|Login|watchlist"
+
+      - name: Upload HTML report (guest)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-guest
+          path: evidence/report/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload test results (guest)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-guest
+          path: evidence/test-results/
+          retention-days: 14
+          if-no-files-found: warn
+
+  e2e-authenticated:
+    name: E2E (autenticado, gate de credencial TMDB)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Check TMDB credentials are configured
+        run: |
+          if [ -z "${{ secrets.TMDB_USERNAME }}" ] || [ -z "${{ secrets.TMDB_PASSWORD }}" ]; then
+            echo "::error::Faltam os secrets TMDB_USERNAME/TMDB_PASSWORD neste repositório."
+            echo "::error::Configure em Settings > Secrets and variables > Actions antes de confiar neste gate."
+            exit 1
+          fi
+
+      - name: Run authenticated tests
+        env:
+          CI: true
           TMDB_USERNAME: ${{ secrets.TMDB_USERNAME }}
           TMDB_PASSWORD: ${{ secrets.TMDB_PASSWORD }}
-        run: npx playwright test
-        # se você configurou projects no config (por ex. apenas chromium)
-        # este comando já respeitará. Pode passar --browser=chromium se
-        # quiser sobrescrever.
+        run: npx playwright test --grep "logado|Login|watchlist"
 
-      - name: Upload HTML report
+      - name: Upload HTML report (authenticated)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: playwright-report-authenticated
+          path: evidence/report/
           retention-days: 14
-        # garante que mesmo em falha o relatório fique disponível
+          if-no-files-found: warn
 
-      - name: Upload test results (JUnit, traces, etc)
+      - name: Upload test results (authenticated)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: test-results/
+          name: test-results-authenticated
+          path: evidence/test-results/
           retention-days: 14
+          if-no-files-found: warn
 
 # você pode adicionar outros jobs (lint, build, etc.) conforme
 # o projeto evoluir, mas para um repositório de testes esta configuração

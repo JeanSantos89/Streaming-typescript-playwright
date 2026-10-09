@@ -29,15 +29,11 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Build application
-        run: npm run build
-
       # ✅ Rode os testes (ajuste o script se você usa outro comando)
       - name: Run Playwright tests
         run: npx playwright test
         env:
-          # Se seus testes usam essas envs (pelo log, sim):
-          TMDB_USER: ${{ secrets.TMDB_USER }}
+          TMDB_USERNAME: ${{ secrets.TMDB_USERNAME }}
           TMDB_PASSWORD: ${{ secrets.TMDB_PASSWORD }}
           # Opcional (alguns projetos usam isso pra mudar comportamento no CI)
           CI: true

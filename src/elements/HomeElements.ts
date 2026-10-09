@@ -15,26 +15,27 @@ export class HomeElements {
   readonly movieOverview: Locator;
 
   constructor(page: Page) {
-    this.searchInput = page.locator('#inner_search_v4');
+    this.searchInput = page.locator('#search_v4');
     this.movieFilterLink = page.locator('a#movie');
 
-    this.firstSearchResult = page
-      .locator('.search_results.movie .results .card')
+    this.searchMovieCards = page.locator('#movie_results [data-object-id]:has(h2)');
+
+    this.firstSearchResult = this.searchMovieCards
       .first()
-      .locator('a.result')
+      .locator('a[data-media-type="movie"]')
       .first();
 
-    this.searchMovieCards = page.locator('.search_results.movie .results .card');
-
-    this.movieMenuOption = page.locator(
-      'li.k-menu-item[aria-haspopup="true"] > a.k-menu-link[href="/movie"]',
-    );
+    this.movieMenuOption = page.locator('a.dropdown-menu-trigger[href="/movie"]');
 
     this.movieMenuFirstOption = page.locator(
-      'ul.k-menu-group li.k-menu-item.k-first > a.k-menu-link',
+      '.dropdown-menu-item:has(> a.dropdown-menu-trigger[href="/movie"]) .dropdown-menu-popup a',
     );
 
-    this.firstMovieCard = page.locator('#page_1 .card.style_1').first();
+    this.firstMovieCard = page
+      .locator('#page_1 [data-object-id]:has(h2)')
+      .first()
+      .locator('a[href^="/movie/"]')
+      .first();
 
     this.movieTitle = page.locator('.title h2 a');
     this.movieRelease = page.locator('.facts .release');
