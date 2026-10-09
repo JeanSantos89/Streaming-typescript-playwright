@@ -197,7 +197,20 @@ Tests run automatically on every push to `main` and on pull requests via GitHub 
 
 - **`assert-quality-audit`** — static check, no browser, no secrets. See [Test Quality Audit](#test-quality-audit) below.
 - **`e2e-guest`** — runs every spec that does not require a TMDB login (CT05, CT07, CT09, CT10, CT11, CT12, CT13, CT14, and the sanity check). No secret needed; this is the required gate for most PRs.
-- **`e2e-authenticated`** — runs the specs that perform a real TMDB login (CT01, CT02, CT03, CT06, CT08). It needs the repository secrets below and fails fast with a clear message if they are missing, instead of failing deep inside Playwright.
+- **`e2e-authenticated`** — runs the specs that perform a real TMDB login (CT01, CT02, CT03, CT06, CT08). It needs the repository secrets below and fails fast with a clear message if they are missing, instead of failing deep inside Playwright. **This job is best-effort and informative, not a required quality gate** — see below.
+
+### Why `e2e-authenticated` is best-effort, not a gate
+
+This job logs into the real, production TMDB website — a third-party service we don't control. TMDB runs bot-detection (AWS WAF) in front of its login, and that WAF has twice blocked this job's automated login outright: the job just hung on "Run authenticated tests" for 15+ minutes with no error, no timeout, nothing — it had to be cancelled by hand both times.
+
+We are **not** going to try to evade that protection (fake user-agent, stealth plugins, artificial human-like delays, etc.). TMDB is someone else's real production service, not a test sandbox, and circumventing their bot defenses would violate their terms of use regardless of the automation's intent. That's a hard line, not a trade-off to optimize around.
+
+So instead of pretending this job can be a reliable gate, or letting it hang forever, we made it honest about its own limits:
+
+- `timeout-minutes: 5` — a real, successful login takes seconds; if it's still running after 5 minutes, that's the WAF blocking it, not a slow test. Fail fast instead of hanging until the default 1-hour timeout.
+- `continue-on-error: true` — a failure (or timeout) in this job does **not** fail the overall workflow run. The gates we actually control — `assert-quality-audit` and `e2e-guest` — stay required and blocking.
+
+This is not a flaw in the test framework. It's an inherent limitation of testing real automated login against a live third-party service that actively tries to detect and block automation. When this job does pass, its green run and uploaded report are still useful signal — just not a merge requirement.
 
 This repo has no backend/API test layer — TMDB here is exercised through the public UI, not the official TMDB API, so there is no separate "API gate"; the authenticated job is the closest equivalent since it is the one gated by a credential.
 
