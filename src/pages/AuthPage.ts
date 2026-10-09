@@ -34,7 +34,7 @@ export class AuthPage extends BasePage {
 
   private async dismissCookieBanner() {
     for (const selector of cookieSelectors) {
-      const btn = this.page.locator(selector);
+      const btn = this.page.locator(selector).first();
       if ((await btn.count()) > 0 && (await btn.isVisible())) {
         await btn.click();
         return;

@@ -7,7 +7,10 @@ export class PaginationElements extends CommonElements {
 
   constructor(page: Page) {
     super(page);
-    this.movieCards = page.locator('#page_1 [data-object-id]:has(h2)');
+    // Cada "carregar mais" soma uma nova página (#page_2, #page_3, ...) como
+    // irmã de #page_1 dentro de #media-list — nunca dentro de #page_1 em si.
+    // Por isso o escopo tem que ser #media-list, não #page_1.
+    this.movieCards = page.locator('#media-list [data-object-id]:has(h2)');
     this.activeLoadMore = page.locator('.pagination.infinite:not(.hide) a.load_more');
   }
 }
